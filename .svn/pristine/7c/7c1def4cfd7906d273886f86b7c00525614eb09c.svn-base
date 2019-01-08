@@ -1,0 +1,68 @@
+//
+//  GWCWebViewController.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/28.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "GWCWebViewController.h"
+
+@interface GWCWebViewController ()<UIWebViewDelegate>
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
+ 
+#define GUC_URL @"https://login.taobao.com/member/login.jhtml"
+
+#define GUC_URL1 @ "http://h5.m.taobao.com/awp/base/bag.htm?ttid=2014_0_23262200%40baichuan_android_1.9.0&umpChannel=1-23262200&u_channel=1-23262200&isv_code=myIsvCode&exParams=%7B%22umpChannel%22%3A%221-23262200%22%2C%22u_channel%22%3A%221-23262200%22%2C%22referer%22%3A%22showCart.taobaoH5%22%2C%22isv_code%22%3A%22myIsvCode%22%7D"
+
+
+@end
+
+@implementation GWCWebViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:GUC_URL1]]];
+    
+    //[self.webView setAutoresizesSubviews:NO];//设置验证方式
+    
+   // [Req setValidatesSecureCertificate:NO]
+    
+    }
+
+- (IBAction)LeftButton:(UIButton *)sender {
+    
+    
+    [self.navigationController popToRootViewControllerAnimated:YES];
+    
+    
+}
+#pragma mark -UIWebViewDelegate
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSLog(@"是否允许加载网页");
+    
+    
+    self.navigationController.navigationBarHidden = YES;
+
+    
+    //进行JS交互
+    return YES;
+}
+
+
+@end
+
+
+
+
+
+
+
+
+
+
+
+

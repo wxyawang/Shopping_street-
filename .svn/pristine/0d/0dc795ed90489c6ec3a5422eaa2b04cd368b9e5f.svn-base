@@ -1,0 +1,207 @@
+//
+//  ShowViewController.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/23.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "ShowViewController.h"
+#import "AFNetworking.h"
+#import "MJRefresh.h"
+#import "ShowCollectionViewCell.h"
+#import "ShowcollectionModel.h"
+#import "UIImageView+AFNetworking.h"
+#import "TaobaoDetailViewController.h"
+
+#define SHOW_URL @"http://m.meiyou.com/tae_item_list?myuid=73722622&tbuid=&device_id=20:08:ed:07:f3:79&platform=android&v=1.1.1&imei=359209025863006&bundleid=186&mode=0&app_id=7&v_auth=3.DqTGf72kmhDOyth2ubECWWx5YuN%%252FozqaQtvtToqdqhs%%253D&sdkversion=17&activity_id=0&brand_area_id=%@&item_id=0&page=1&source=&tab=item"
+
+
+@interface ShowViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,MJRefreshBaseViewDelegate>
+{
+    MJRefreshFooterView *_footerView;
+    MJRefreshHeaderView *_HeaderView;
+    NSInteger count;
+}
+
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+
+
+
+@property (nonatomic,strong)UILabel *label;
+
+@end
+
+@implementation ShowViewController
+
+-(NSMutableArray *)DataArray
+{
+    if (_DataArray == nil) {
+        _DataArray = [NSMutableArray new];
+    }
+    return _DataArray;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    
+    
+    [self getFromShowNet];
+    
+    //注册cell
+    
+    [self.collectionView registerNib:[UINib nibWithNibName:@"ShowCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:@"cell"];
+    
+    self.collectionView.delegate = self;
+    self.collectionView.dataSource = self;
+    
+    _HeaderView = [[MJRefreshHeaderView alloc]initWithScrollView:self.collectionView];
+    _footerView = [[MJRefreshFooterView alloc]initWithScrollView:self.collectionView];
+    
+    _footerView.delegate = self;
+    _footerView.delegate = self;
+    
+    
+}
+
+- (IBAction)clickButton:(UIButton *)sender {
+    
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+- (IBAction)RightButton:(id)sender {
+    
+    
+}
+
+     
+-(void)getFromShowNet
+{
+    AFHTTPRequestOperationManager *manger = [AFHTTPRequestOperationManager manager];
+    
+    manger.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+    
+    [manger GET:[NSString stringWithFormat:SHOW_URL,self.brand_area_idLabel] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        
+        [_HeaderView endRefreshing];
+        [_footerView endRefreshing];
+        
+        if (count ==0) {
+            
+            [self.DataArray removeAllObjects];
+        }
+        
+        //解析数据
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+        
+      //  NSLog(@"dict=%@",dict);
+        
+        NSArray *itemsArray = dict[@"items"];
+        
+        for (NSDictionary *dict1 in itemsArray) {
+            
+            ShowcollectionModel *model = [ShowcollectionModel new];
+            
+            model.nameLabel = dict1[@"name"];
+            model.vip_priceLabel = dict1[@"vip_price"];
+            model.pictureLabel = dict1[@"picture"];
+            model.redirect_url = dict1[@"redirect_url"];
+            
+           // NSLog(@"l=%@",model.redirect_url);
+
+            [self.DataArray addObject:model];
+            
+        }
+        [self.collectionView reloadData];
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"获取详情数据失败");
+    }];
+}
+
+#pragma mark-UICollectionViewDataSource
+
+-(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return self.DataArray.count;
+}
+
+
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    ShowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    
+      
+    
+    ShowcollectionModel *model = self.DataArray[indexPath.item];
+    
+    cell.nameLabel.text =model.nameLabel;
+    
+    cell.vip_priceLabel.text = model.vip_priceLabel;
+    
+    [cell.pictureImage setImageWithURL:[NSURL URLWithString:model.pictureLabel]];
+   
+    
+    return cell;
+}
+
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    TaobaoDetailViewController *tvc = [TaobaoDetailViewController new];
+    ShowcollectionModel *model = self.DataArray[indexPath.item];
+    
+    tvc.url = [NSURL URLWithString:model.redirect_url];
+    
+     
+    tvc.hidesBottomBarWhenPushed = YES;
+    
+    [self.navigationController pushViewController:tvc animated:YES];
+     
+}
+
+#pragma mark-MJRefreshBaseViewDelegate
+
+-(void)refreshViewBeginRefreshing:(MJRefreshBaseView *)refreshView
+{
+    
+    if (refreshView == _footerView) {
+        
+        count ++;
+        
+     }else
+    {
+        count = 0;
+        
+    }
+    
+    [self getFromShowNet];
+}
+
+
+
+//返回时防止程序崩掉
+- ( void )dealloc
+{
+    [_HeaderView free];
+    [_footerView free];
+}
+
+@end
+
+
+
+
+
+
+
+
+
+
+

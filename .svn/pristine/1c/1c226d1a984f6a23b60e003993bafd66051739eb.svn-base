@@ -1,0 +1,47 @@
+//
+//  ShopingCartViewController.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/22.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "ShopingCartViewController.h"
+#import "GWCWebViewController.h"
+
+@interface ShopingCartViewController ()
+
+@end
+
+@implementation ShopingCartViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    self.navigationController.navigationBarHidden = YES;
+    
+}
+
+- (IBAction)Login:(UIButton *)sender {
+    
+    GWCWebViewController *wcc = [GWCWebViewController new];
+    
+    wcc.hidesBottomBarWhenPushed = YES;
+
+    
+    [self.navigationController pushViewController:wcc animated:YES];
+}
+ 
+@end
+
+
+
+
+
+
+
+
+
+
+

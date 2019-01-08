@@ -1,0 +1,167 @@
+//
+//  HerCircleViewController.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/28.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "HerCircleViewController.h"
+#import "HerWebViewController.h"
+#import "HerCircleModel.h"
+#import "HerCircleViewCell.h"
+#import "AFNetworking.h"
+#import "UIImageView+AFNetworking.h"
+
+@interface HerCircleViewController ()<UITableViewDataSource,UITableViewDelegate>
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic,strong)NSMutableArray *dataSource;
+
+@end
+
+@implementation HerCircleViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    self.title = @"贝贝圈";
+    
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    
+    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];//设置自己想要的颜色
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:nil];
+    
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:253/255.0 green:109/255.0 blue:142/255.0 alpha:1.0];
+    
+    self.automaticallyAdjustsScrollViewInsets = NO;
+     
+    
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    
+    [self.tableView registerNib:[UINib nibWithNibName:@"HerCircleViewCell" bundle:nil] forCellReuseIdentifier:@"cell"];
+    
+    [self getFromData];
+    
+}
+
+-(void)getFromData
+{
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"JsonFile" ofType:@"json"];
+    
+    NSData *jsonData = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedIfSafe error:nil];
+    
+    NSMutableDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
+    
+   // NSLog(@"dic = %@",dic);
+    
+    //解析数据
+    
+    NSDictionary *dict1 = dic[@"content"];
+    
+     NSArray *subject_listsArray = dict1[@"subject_lists"];
+    
+    for (NSDictionary *dict2 in subject_listsArray) {
+        
+        HerCircleModel *model = [HerCircleModel new];
+        
+        NSDictionary *active_infodict3 = dict2[@"active_info"];
+        
+        NSArray *comment_infoArray3 = dict2[@"comment_info"];
+        
+        model.title = active_infodict3[@"title"];
+        
+        
+        model.image_url = dict2[@"image_url"];
+        model.text = dict2[@"text"];
+        model.wap_url = active_infodict3[@"wap_url"];
+        
+        for (NSDictionary *dict4 in comment_infoArray3) {
+            
+            //NSDictionary *dict5 = dict4 [@"comment_user"][@"child_age"];;
+            
+             model.child_age =dict4 [@"comment_user"][@"child_age"];
+            
+            model.icon = dict4[@"comment_user"][@"icon"];
+            
+            model.nickname = dict4[@"comment_user"][@"nickname"];
+            
+        }
+        
+        
+        [self.dataSource addObject:model];
+    }
+    
+    [self.tableView reloadData];
+    
+    
+}
+
+
+#pragma mark-UITableViewDataSource
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.dataSource.count;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+   // HerCircleViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
+    HerCircleViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
+    
+    HerCircleModel *model = self.dataSource[indexPath.row];
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    cell.wap_url.text = model.title;
+    cell.child_ageLabel.text = model.child_age;
+    cell.nicknameLabel.text = model.nickname;
+    cell.text.text = model.text;
+    cell.iconImage.layer.cornerRadius = 25;
+    cell.iconImage.layer.masksToBounds = YES;
+    [cell.iconImage setImageWithURL:[NSURL URLWithString:model.icon]];
+    [cell.image_url setImageWithURL:[NSURL URLWithString:model.image_url]];
+    
+    return cell;
+}
+
+-(NSMutableArray *)dataSource
+{
+    if (_dataSource == nil) {
+        _dataSource = [NSMutableArray new];
+    }
+    return _dataSource;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 400;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    HerWebViewController *hvc = [HerWebViewController new];
+    
+    HerCircleModel *model = self.dataSource[indexPath.row];
+    
+    hvc.url = model.wap_url;
+    
+    hvc.hidesBottomBarWhenPushed = YES;
+    
+    [self.navigationController pushViewController:hvc animated:YES];
+}
+ @end
+
+
+
+
+
+
+
+
+
+
+
+

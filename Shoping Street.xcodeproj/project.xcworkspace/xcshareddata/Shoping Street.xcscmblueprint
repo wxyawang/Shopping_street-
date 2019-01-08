@@ -1,0 +1,24 @@
+{
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "27e7b2d2-bee6-4bfd-b82c-4a1d65b22511++9287" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "27e7b2d2-bee6-4bfd-b82c-4a1d65b22511++9287" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "0AE5BB79-C705-4E28-9ECD-8013B3824A8F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "27e7b2d2-bee6-4bfd-b82c-4a1d65b22511++9287" : "Shoping%20Street%20%20%202\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Shoping Street",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Shoping Street.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn:\/\/10.2.8.8\/1539\/1539056",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "27e7b2d2-bee6-4bfd-b82c-4a1d65b22511++9287"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+//
+//  ShowCollectionViewCell.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/24.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "ShowCollectionViewCell.h"
+
+@implementation ShowCollectionViewCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+@end

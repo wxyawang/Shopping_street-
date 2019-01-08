@@ -1,0 +1,139 @@
+//
+//  LeftViewController.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/26.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "LeftViewController.h"
+ #import "HomeFurnishingViewController.h"
+#import "BeautifulyFootViewController.h"
+#import "BeautyViewController.h"
+#import "BabyViewController.h"
+#import "ClothingViewController.h"
+
+@interface LeftViewController ()<UITableViewDelegate,UITableViewDataSource>
+
+@property (nonatomic,strong)NSArray *dataSource;
+
+@property(nonatomic,strong)UITableView *table;
+
+ @end
+
+@implementation LeftViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    self.navigationController.navigationBarHidden = YES;
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.dataSource = @[@"",@"首页",@"服装折扣",@"家居折扣",@"美食折扣",@"美妆折扣",@"母婴折扣"];
+    
+ 
+    
+    
+    self.table = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, 375, 667- 350)];
+    
+     self.table.dataSource = self;
+    self.table.delegate = self;
+    [self.view addSubview:self.table];
+    
+}
+
+#pragma mark -UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.dataSource.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    
+    if (!cell)
+    {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    }
+    cell.textLabel.text = self.dataSource[indexPath.row];
+    
+    
+    cell.textLabel.highlightedTextColor = [UIColor colorWithRed:252/255.0 green:52/255.0 blue:128/255.0 alpha:1.0];
+    
+    
+    return cell;
+    
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+ 
+    if ([indexPath row] == 2) {
+    
+        [self.table deselectRowAtIndexPath:indexPath animated:YES];
+        
+        ClothingViewController *cvc = [ClothingViewController new];
+        
+        [self presentViewController:cvc animated:UIModalTransitionStyleCoverVertical completion:nil];
+        
+     }else if ([indexPath row] == 3){
+        
+          [self.table deselectRowAtIndexPath:indexPath animated:YES];
+         
+         HomeFurnishingViewController*hvc = [HomeFurnishingViewController new];
+         
+         [self presentViewController:hvc animated:UIModalTransitionStyleCoverVertical completion:nil];
+         
+     }else if([indexPath row] == 4){
+         
+          [self.table deselectRowAtIndexPath:indexPath animated:YES];
+         
+         BeautifulyFootViewController *bfc = [BeautifulyFootViewController new];
+         
+         [self presentViewController:bfc animated:UIModalTransitionStyleCoverVertical completion:nil];
+         
+     }else if([indexPath row] == 5){
+         
+         [self.table deselectRowAtIndexPath:indexPath animated:YES];
+         
+         BeautyViewController *bvc = [BeautyViewController new];
+         
+         [self presentViewController:bvc animated:UIModalTransitionStyleCoverVertical completion:nil];
+         
+     }else if([indexPath row] == 6){
+         
+          [self.table deselectRowAtIndexPath:indexPath animated:YES];
+         
+         BabyViewController *bac = [BabyViewController new];
+         
+  //       UIModalTransitionStyleCoverVertical
+//         UIModalTransitionStyleFlipHorizontal,
+//         UIModalTransitionStyleCrossDissolve,
+//         UIModalTransitionStylePartialCurl,
+
+         
+         [self presentViewController:bac animated:UIModalTransitionStyleCoverVertical completion:nil];
+         
+     }
+    
+    
+    
+ }
+
+@end
+
+
+
+
+
+
+
+
+
+
+

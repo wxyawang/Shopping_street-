@@ -1,0 +1,398 @@
+//
+//  ShopingStreetViewController.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/22.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "ShopingStreetViewController.h"
+#import "AFNetworking.h"
+#import "ShopingStreet.h"
+#import "ScrollViewModel.h"
+#import "URLModel.h"
+#import "ShowcollectionModel.h"
+#import "ScrollView.h"
+#import "ShopingStreetTableViewCell.h"
+#import "TaobaoDetailViewController.h"
+ #import "UIImageView+AFNetworking.h"
+#import "ShowViewController.h"
+
+#import "ClothingViewController.h"
+
+#import "LeftViewController.h"//左视图文件
+#import "UIViewController+MMDrawerController.h" //第三方封装的文件
+#import "MMDrawerBarButtonItem.h"
+
+
+#define GWJ_URL @"http://m.meiyou.com/tae_brand_list?myuid=73722622&tbuid=&device_id=20:08:ed:07:f3:79&platform=android&v=1.1.1&imei=359209025863006&bundleid=186&mode=0&app_id=7&v_auth=3.DqTGf72kmhDOyth2ubECWWx5YuN%252FozqaQtvtToqdqhs%253D&sdkversion=17&path=&timestamp="
+
+#define SHOW_URL @"http://m.meiyou.com/tae_item_list?myuid=73722622&tbuid=&device_id=20:08:ed:07:f3:79&platform=android&v=1.1.1&imei=359209025863006&bundleid=186&mode=0&app_id=7&v_auth=3.DqTGf72kmhDOyth2ubECWWx5YuN%%252FozqaQtvtToqdqhs%%253D&sdkversion=17&activity_id=0&brand_area_id=%@&item_id=0&page=1&source=&tab=item"
+
+#define SHOW_URL1 @"http://m.meiyou.com/tae_item_list?myuid=73722622&tbuid=&device_id=20:08:ed:07:f3:79&platform=android&v=1.1.1&imei=359209025863006&bundleid=186&mode=0&app_id=7&auth=3.e6%252FqGrXdHtwYLX3rhveAfIQJQGQnzZC6iWMtmJGTub4%253D&sdkversion=17&activity_id=0&brand_area_id=27791&item_id=0&page=1&source=&tab=item "
+
+@interface ShopingStreetViewController ()<UITableViewDataSource,UITableViewDelegate,UIWebViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UITableView *ShopingTableView;
+
+ 
+@property (nonatomic ,strong)NSMutableArray *dataArray;//cell数据源
+
+@property (nonatomic ,strong)NSMutableArray *dataSource;//广告栏数据源
+
+@property (nonatomic,strong)NSMutableArray *dataArray1;
+
+
+@property (weak, nonatomic) IBOutlet UIButton *LeftButton;
+
+
+@end
+
+@implementation ShopingStreetViewController
+
+-(NSMutableArray *)dataArray1
+{
+    if (_dataArray1 == nil) {
+        _dataArray1 = [NSMutableArray new];
+    }
+    return _dataArray1;
+}
+
+-(NSMutableArray *)dataArray
+{
+    if (_dataArray == nil) {
+        _dataArray = [NSMutableArray new];
+    }
+    return _dataArray;
+}
+
+-(NSMutableArray *)dataSource
+{
+    if (_dataSource == nil) {
+        _dataSource = [NSMutableArray new];
+    }
+    return _dataSource;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    self.navigationController.navigationBarHidden = YES;
+    
+    self.ShopingTableView.delegate = self;
+    self.ShopingTableView.dataSource = self;
+    
+    //注册
+    [self.ShopingTableView registerNib:[UINib nibWithNibName:@"ShopingStreetTableViewCell" bundle:nil] forCellReuseIdentifier:@"cell"];
+    
+    //获取cell数据
+    [self getDataFromNet];
+    //获取广告栏数据
+    [self getDataSourceFrom];
+    
+    
+
+   // [self getCollectionFrom];
+    
+    
+}
+
+
+- (IBAction)LEftButton:(UIButton *)sender {
+    
+    //开关左抽屉
+    [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
+}
+
+ 
+
+- (IBAction)RightButton:(id)sender {
+    
+//    ClothingViewController *cvc = [ClothingViewController new];
+//    
+//    cvc.hidesBottomBarWhenPushed = YES;
+//    
+//    [self.navigationController pushViewController:cvc animated:YES];
+    
+}
+
+
+//获取collection文件
+
+-(void)getCollectionFrom
+{
+    AFHTTPRequestOperationManager *manger = [AFHTTPRequestOperationManager manager];
+    
+    manger.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+  //  NSLog(@"%@=L",SHOW_URL);
+    
+  /*
+    [manger GET:SHOW_URL1 parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        //解析数据
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+        
+          NSLog(@"dict=%@",dict);
+        
+        NSArray *itemsArray = dict[@"items"];
+        
+        for (NSDictionary *dict1 in itemsArray) {
+            
+            URLModel *model = [URLModel new];
+ 
+            model.redirect_url = dict1[@"redirect_url"];
+            
+            NSLog(@"l=%@",model.redirect_url);
+
+            //[self.dataArray1 addObject:model];
+            
+        }
+       // [self.ShopingTableView reloadData];
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"获取详情数据失败");
+    }];
+   
+   */
+    
+    
+    
+    [manger GET:SHOW_URL1 parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject)
+    
+    
+    {
+        
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+        
+        
+        NSArray *itemsArray = dict[@"items"];
+        
+        for (NSDictionary *dict1 in itemsArray) {
+            
+            URLModel *model = [URLModel new];
+            
+            model.redirect_url = dict1[@"redirect_url"];
+            
+            NSLog(@"l=%@",model.redirect_url);
+        
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"获取数据失败");
+     
+        
+    }];
+    
+    
+    
+}
+
+
+
+//获取cell数据
+-(void)getDataFromNet
+{
+    AFHTTPRequestOperationManager *manger = [AFHTTPRequestOperationManager manager];
+    
+    manger.responseSerializer = [AFHTTPResponseSerializer serializer];
+
+    [manger GET:GWJ_URL parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        
+        //解析数据
+        
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+       
+       NSArray *item_listArray= dict[@"item_list"];
+        for (NSDictionary *dict1 in item_listArray) {
+            
+            NSArray *item_listArray1 = dict1[@"item_list"];
+            
+            
+            for (NSDictionary *dict2 in item_listArray1) {
+                
+                ShopingStreet *model = [ShopingStreet new];
+                model.NameLabel = dict2[@"name"];
+               model.PictureImage = dict2[@"picture"];
+                
+                model.original_priceLabel = dict2[@"original_price"];
+                
+                
+              model.promotion_customLabel = dict2[@"promotion_custom"];
+                model.purchase_btnLabel = dict2[@"purchase_btn"];
+                model.vip_price = dict2[@"vip_price"];
+                
+                model.item_count_msgLabel = dict2[@"item_count_msg"];
+                model.brand_area_idLabel = dict2[@"brand_area_id"];
+                model.brand_area_nameLabel = dict2[@"brand_area_name"];
+                
+                [self.dataArray addObject:model];
+           }
+            
+            [self.ShopingTableView reloadData];
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"获取数据失败");
+    }];
+}
+
+//获取广告栏的数据
+
+
+
+-(void)getDataSourceFrom
+{
+    AFHTTPRequestOperationManager *manger = [AFHTTPRequestOperationManager manager];
+    
+    manger.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+    [manger GET:GWJ_URL parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        //解析数据
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+        
+        NSArray *bannerArray = dict[@"banner"];
+        
+        for (NSDictionary *dict1 in bannerArray) {
+            
+            ScrollViewModel *model = [ScrollViewModel new];
+            
+            model.picture_url = dict1[@"picture_url"];
+            model.name = dict1[@"name"];
+            
+            
+           // NSLog(@"dict1=%@",dict1);
+            
+            [self.dataSource addObject:model];
+            
+            [self.ShopingTableView reloadData];
+        }
+        
+        
+        ScrollView *headerView = [[[NSBundle mainBundle]loadNibNamed:@"ScrollView" owner:nil options:nil]firstObject];
+        
+        headerView.frame = CGRectMake(0, 0, 375, 150);
+        
+        headerView.scrollDatas = self.dataSource;
+        
+        self.ShopingTableView.tableHeaderView = headerView;
+    
+       // ShowViewController *svc = [ShowViewController new];
+        
+        
+
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"获取数据失败");
+    }];
+}
+
+ 
+#pragma mark-UITableViewDataSource
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.dataArray.count;
+}
+
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    ShopingStreetTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
+    
+     cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    ShopingStreet *model = self.dataArray[indexPath.row];
+    
+    cell.NameLabel.text = model.NameLabel;
+    
+    NSString *string = [NSString stringWithFormat:@"%@",model.original_priceLabel];
+    
+    cell.original_priceLabel.text = string;
+    cell.purchase_btnLabel.text = model.purchase_btnLabel;
+    cell.vip_priceLabel.text = model.vip_price;
+    cell.promotion_customLabel.text = model.promotion_customLabel;
+    
+    if (model.item_count_msgLabel.length == 0) {
+        
+        cell.item_count_msgLabel.hidden = YES;
+ 
+    }else
+    {
+        cell.item_count_msgLabel.hidden = NO;
+    }
+    
+    cell.item_count_msgLabel.text = model.item_count_msgLabel;
+    
+    
+    [cell.PictureImage setImageWithURL:[NSURL URLWithString:model.PictureImage]];
+    
+    
+    return cell;
+    
+}
+
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+     /*
+    
+    ShowViewController *svc = [ShowViewController new];
+    
+    ShopingStreet *model = self.dataArray[indexPath.row] ;
+    
+    svc.brand_area_idLabel  = [NSString stringWithFormat:@"%@",model.brand_area_idLabel];
+    
+    svc.titleLabel.text = model.brand_area_nameLabel;
+    
+    [self.navigationController pushViewController:svc animated:YES];
+      
+      */
+    
+    ShopingStreet *model = self.dataArray[indexPath.row];
+    
+    if (model.item_count_msgLabel.length == 0) {
+        
+        TaobaoDetailViewController *tvc = [TaobaoDetailViewController new];
+        
+ 
+        
+        URLModel *model = [URLModel new];
+        
+        tvc.url = [NSURL URLWithString:model.redirect_url];
+        
+       // NSLog(@"l=%@",model.redirect_url);
+        
+        [self.navigationController pushViewController:tvc animated:YES];
+        
+    }else{
+        
+    
+    ShowViewController *svc = [ShowViewController new];
+    
+    svc.brand_area_idLabel  = [NSString stringWithFormat:@"%@",model.brand_area_idLabel];
+    
+    svc.titleLabel.text = model.brand_area_nameLabel;
+    
+    [self.navigationController pushViewController:svc animated:YES];
+    
+    }
+}
+
+ @end
+
+
+
+
+
+
+
+
+
+

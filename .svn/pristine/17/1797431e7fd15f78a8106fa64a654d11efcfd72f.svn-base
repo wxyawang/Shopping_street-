@@ -1,0 +1,150 @@
+//
+//  ScrollView.m
+//  Shoping Street
+//
+//  Created by WANGXINYU on 16/3/23.
+//  Copyright © 2016年 wangxinyu. All rights reserved.
+//
+
+#import "ScrollView.h"
+#import "ScrollViewModel.h"
+#import "ShowViewController.h"
+ #import "UIImageView+AFNetworking.h"
+#import "AFNetworking.h"
+
+#define URL_SCOLL @"http://m.meiyou.com/tae_item_list?myuid=73722622&tbuid=&device_id=20:08:ed:07:f3:79&platform=android&v=1.1.1&imei=359209025863006&bundleid=186&mode=0&app_id=7&auth=3.e6%%252FqGrXdHtwYLX3rhveAfIQJQGQnzZC6iWMtmJGTub4%%253D&sdkversion=17&activity_id=0&brand_area_id=%@&item_id=0&page=1&source=002000000&tab="
+@interface ScrollView()<UIScrollViewDelegate>
+{
+    NSInteger count;//下一秒
+}
+
+@property (weak, nonatomic) IBOutlet UIScrollView *ScrollView;
+@property (weak, nonatomic) IBOutlet UIPageControl *PageControl;
+
+@end
+
+@implementation ScrollView
+
+-(void)awakeFromNib
+{
+    self.ScrollView.delegate = self;
+    
+    [self getScrollNetFrom];
+    
+}
+
+-(void)setScrollDatas:(NSArray *)scrollDatas
+{
+    
+    
+    _scrollDatas = scrollDatas;
+    
+    for (UIView *view in self.ScrollView.subviews) {
+        
+        [view removeFromSuperview];
+    }
+    
+    //contensize
+    self.ScrollView.contentSize = CGSizeMake(375 * scrollDatas.count, 0);
+    
+    self.PageControl.numberOfPages = scrollDatas.count;
+
+    for (int i = 0; i < scrollDatas.count; i++) {
+        
+        ScrollViewModel *model = scrollDatas[i];
+        
+        UIImageView *imgView = [[UIImageView alloc]initWithFrame:CGRectMake(375 * i, 0, 375, 150)];
+        
+        [imgView setImageWithURL:[NSURL URLWithString:model.picture_url]];
+        
+        self.ScrollView.showsHorizontalScrollIndicator = NO;
+        self.ScrollView.showsVerticalScrollIndicator = NO;
+        self.ScrollView.bounces = NO;
+        
+        imgView.userInteractionEnabled = YES;
+        
+        imgView.tag = 10 + i;
+        
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickTap:)];
+        
+        [imgView addGestureRecognizer:tap];
+        
+        [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(updataTimer:) userInfo:nil repeats:YES];
+        count = 0;
+        
+        [self.ScrollView addSubview:imgView];
+        
+     
+    }
+}
+
+-(void)getScrollNetFrom
+{
+    AFHTTPRequestOperationManager *manger = [AFHTTPRequestOperationManager manager];
+    
+    manger.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+    [manger GET:[NSString stringWithFormat:URL_SCOLL,self.brand_area_idLabel] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        //解析数据
+        
+        
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"获取广告栏里面数据失败");
+    
+    }];
+}
+
+//启动定时器
+-(void)updataTimer:(NSTimer *)timer
+{
+    count ++;
+    if (count == 3) {
+        self.ScrollView.contentOffset = CGPointMake(0, 0);
+        count = 0;
+    }
+    [self.ScrollView setContentOffset:CGPointMake(count * 375, 0) animated:YES];
+    self.PageControl.currentPage = count  ;
+}
+
+//启动手势
+-(void)clickTap:(UITapGestureRecognizer *)tap
+{
+    UIImageView *image = (UIImageView *)tap.view;
+    
+    NSInteger i = image.tag - 10;
+    
+    ShowViewController *svc = [ShowViewController new];
+    
+   // NSLog(@"111");
+    
+}
+#pragma mark -UIScrollViewDelegate
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    CGPoint offset = self.ScrollView.contentOffset;
+    
+    NSInteger index = offset.x / 375;
+    
+    self.PageControl.currentPage = index ;
+    
+  //  NSLog(@"22");
+}
+@end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
